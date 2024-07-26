@@ -52,15 +52,10 @@ class ParCorr(CondIndTest):
         """
         return self._measure
 
-    def __init__(self, plot = False, bias = False, degree = 1, interaction_only=False, **kwargs):
+    def __init__(self, **kwargs):
         self._measure = 'par_corr'
         self.two_sided = True
         self.residual_based = True
-
-        self.plot = plot
-        self.bias = bias
-        self.degree = degree
-        self.interaction_only = interaction_only
 
         CondIndTest.__init__(self, **kwargs)
 
@@ -116,7 +111,6 @@ class ParCorr(CondIndTest):
 
         if dim_z > 0:
             z = np.fastCopyAndTranspose(array[2:, :])
-            if self.degree > 1: z = PolynomialFeatures(degree=self.degree, include_bias=self.bias, interaction_only=self.interaction_only).fit_transform(z)
             beta_hat = np.linalg.lstsq(z, y, rcond=None)[0]
             mean = np.dot(z, beta_hat)
             resid = y - mean
