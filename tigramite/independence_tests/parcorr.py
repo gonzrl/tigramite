@@ -10,6 +10,7 @@ import numpy as np
 import sys
 import warnings
 from sklearn.preprocessing import PolynomialFeatures
+import pysindy as ps
 
 from .independence_tests_base import CondIndTest
 
