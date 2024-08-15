@@ -53,10 +53,17 @@ class ParCorr(CondIndTest):
         """
         return self._measure
 
-    def __init__(self, **kwargs):
+    def __init__(self, sparse = False, degree = 1, threshold = 0.1, **kwargs):
         self._measure = 'par_corr'
         self.two_sided = True
         self.residual_based = True
+        self.sparse = sparse
+        self.degree = degree
+        if self.sparse:
+            self.model = ps.SINDy(
+                feature_library = ps.PolynomialLibrary(degree=degree),
+                optimizer = ps.STLSQ(threshold=threshold)
+            )
 
         CondIndTest.__init__(self, **kwargs)
 
@@ -112,8 +119,13 @@ class ParCorr(CondIndTest):
 
         if dim_z > 0:
             z = np.fastCopyAndTranspose(array[2:, :])
-            beta_hat = np.linalg.lstsq(z, y, rcond=None)[0]
-            mean = np.dot(z, beta_hat)
+            if not self.sparse:
+                if self.degree > 1: z = PolynomialFeatures(degree=self.degree, include_bias=True, interaction_only=False).fit_transform(z)
+                beta_hat = np.linalg.lstsq(z, y, rcond=None)[0]
+                mean = np.dot(z, beta_hat)
+            else: 
+                self.model.fit_regression(x = z, y = y)
+                mean = np.array(self.model.predict(z).reshape(len(z)))
             resid = y - mean
         else:
             resid = y
