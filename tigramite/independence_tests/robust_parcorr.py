@@ -194,7 +194,7 @@ class RobustParCorr(CondIndTest):
                 beta_hat = np.linalg.lstsq(z, y, rcond=None)[0]
                 mean = np.dot(z, beta_hat)
             else: 
-                self.model.fit_regression(x = z, y = y)
+                self.model.fit_regression(x = z, y = y.reshape(-1,1))
                 mean = np.array(self.model.predict(z).reshape(len(z)))
             resid = y - mean
         else:
